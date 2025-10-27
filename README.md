@@ -45,7 +45,7 @@ A full-stack web application that automatically analyzes and ranks candidate res
    cp backend/.env.example backend/.env
    
    # Edit backend/.env and add your OpenAI API key
-   APP_OPENAI_API_KEY=your_openai_api_key_here
+   OPENAI_API_KEY=your_openai_api_key_here
    ```
 
 3. **Start the application**
@@ -466,7 +466,7 @@ DB_HOST=your_db_host
 DB_DATABASE=your_db_name
 DB_USERNAME=your_db_user
 DB_PASSWORD=your_db_password
-APP_OPENAI_API_KEY=your_openai_key
+OPENAI_API_KEY=your_openai_key
 ```
 
 ### Docker Production Build

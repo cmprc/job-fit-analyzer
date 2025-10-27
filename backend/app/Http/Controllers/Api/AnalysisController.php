@@ -21,9 +21,6 @@ class AnalysisController extends Controller
         $this->openAIService = $openAIService;
     }
 
-    /**
-     * Display a listing of analyses for a specific job
-     */
     public function index(Request $request): JsonResponse
     {
         $jobId = $request->query('job_id');
@@ -40,9 +37,6 @@ class AnalysisController extends Controller
         return response()->json($analyses);
     }
 
-    /**
-     * Analyze a candidate against a job
-     */
     public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
@@ -73,7 +67,6 @@ class AnalysisController extends Controller
                 $candidate->extracted_text
             );
 
-            // Create analysis record
             $analysis = Analysis::create([
                 'job_id' => $job->id,
                 'candidate_id' => $candidate->id,

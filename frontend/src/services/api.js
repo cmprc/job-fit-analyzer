@@ -26,7 +26,6 @@ class ApiService {
     }
   }
 
-  // Job methods
   async getJobs() {
     return this.request('/jobs');
   }
@@ -35,7 +34,7 @@ class ApiService {
     return this.request('/jobs', {
       method: 'POST',
       body: formData,
-      headers: {}, // Let browser set Content-Type for FormData
+      headers: {},
     });
   }
 
@@ -56,7 +55,6 @@ class ApiService {
     });
   }
 
-  // Candidate methods
   async getCandidates() {
     return this.request('/candidates');
   }
@@ -65,7 +63,7 @@ class ApiService {
     return this.request('/candidates', {
       method: 'POST',
       body: formData,
-      headers: {}, // Let browser set Content-Type for FormData
+      headers: {},
     });
   }
 
@@ -86,7 +84,6 @@ class ApiService {
     });
   }
 
-  // Analysis methods
   async getAnalyses(jobId) {
     return this.request(`/analyses?job_id=${jobId}`);
   }

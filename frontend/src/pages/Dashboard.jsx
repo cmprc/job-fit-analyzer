@@ -19,6 +19,15 @@ const Dashboard = () => {
     loadData();
   }, []);
 
+  // Load analyses when selectedJob changes
+  useEffect(() => {
+    if (selectedJob) {
+      loadAnalysesForJob(selectedJob.id);
+    } else {
+      setAnalyses([]);
+    }
+  }, [selectedJob]);
+
   const loadData = async () => {
     try {
       setInitialLoading(true);
@@ -29,16 +38,23 @@ const Dashboard = () => {
       setJobs(jobsData);
       setCandidates(candidatesData);
       
-      // If there's only one job and candidates exist, auto-select and analyze
-      if (jobsData.length === 1 && candidatesData.length > 0) {
-        const job = jobsData[0];
-        setSelectedJob(job);
-        await handleAnalyzeAll(job.id);
+      if (jobsData.length === 1) {
+        setSelectedJob(jobsData[0]);
       }
     } catch (error) {
       console.error('Failed to load data:', error);
     } finally {
       setInitialLoading(false);
+    }
+  };
+
+  const loadAnalysesForJob = async (jobId) => {
+    try {
+      const analysesData = await apiService.getAnalyses(jobId);
+      setAnalyses(analysesData);
+    } catch (error) {
+      console.error('Failed to load analyses:', error);
+      setAnalyses([]);
     }
   };
 
@@ -51,11 +67,6 @@ const Dashboard = () => {
       const newJob = await apiService.createJob(formData);
       setJobs([...jobs, newJob]);
       setSelectedJob(newJob);
-      
-      // Automatically trigger analysis if candidates are available
-      if (candidates.length > 0) {
-        await handleAnalyzeAll(newJob.id);
-      }
     } catch (error) {
       throw error;
     }
@@ -154,16 +165,10 @@ const Dashboard = () => {
                   </label>
                   <select
                     value={selectedJob?.id || ''}
-                    onChange={async (e) => {
+                    onChange={(e) => {
                       const jobId = parseInt(e.target.value);
                       const job = jobs.find(j => j.id === jobId);
                       setSelectedJob(job);
-                      setAnalyses([]);
-                      
-                      // Automatically trigger analysis if candidates are available
-                      if (job && candidates.length > 0) {
-                        await handleAnalyzeAll(jobId);
-                      }
                     }}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2"
                   >
@@ -198,7 +203,7 @@ const Dashboard = () => {
         )}
 
         {/* Analysis Section */}
-        {selectedJob && candidates.length > 0 && (
+        {selectedJob && (
           <div className="bg-white rounded-lg shadow p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-900">
@@ -212,16 +217,42 @@ const Dashboard = () => {
               )}
             </div>
             
-            <p className="text-sm text-gray-600 mb-4">
-              {loading 
-                ? `Analyzing all ${candidates.length} candidates against the selected job description using AI...`
-                : `Analysis completed for ${candidates.length} candidates against "${selectedJob.title}"`
-              }
-            </p>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-gray-600">
+                {loading 
+                  ? `Analyzing all ${candidates.length} candidates against the selected job description using AI...`
+                  : analyses.length > 0 
+                    ? `Analysis completed for ${analyses.length} candidate${analyses.length === 1 ? '' : 's'} against "${selectedJob.title}"`
+                    : candidates.length > 0
+                      ? `Ready to analyze ${candidates.length} candidates against "${selectedJob.title}"`
+                      : `No candidates available for analysis against "${selectedJob.title}"`
+                }
+              </p>
+              
+              {candidates.length > 0 && (
+                <button
+                  onClick={() => handleAnalyzeAll()}
+                  disabled={loading}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    loading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2'
+                  }`}
+                >
+                  {loading ? 'Analyzing...' : 'Run Analysis'}
+                </button>
+              )}
+            </div>
             
-            {!loading && analyses.length === 0 && (
+            {!loading && analyses.length === 0 && candidates.length === 0 && (
               <div className="text-center py-4 text-gray-500">
-                <p>Analysis will start automatically when you select a job.</p>
+                <p>Upload candidate resumes to start analyzing against the selected job description.</p>
+              </div>
+            )}
+            
+            {!loading && analyses.length === 0 && candidates.length > 0 && (
+              <div className="text-center py-4 text-gray-500">
+                <p>Click "Run Analysis" to start analyzing candidates against the selected job description.</p>
               </div>
             )}
           </div>

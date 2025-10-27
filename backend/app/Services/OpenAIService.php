@@ -15,9 +15,6 @@ class OpenAIService
         $this->apiKey = env('OPENAI_API_KEY');
     }
 
-    /**
-     * Analyze resume against job description
-     */
     public function analyzeResume(string $jobDescription, string $resumeText): array
     {
         if (!$this->apiKey) {
@@ -58,9 +55,6 @@ class OpenAIService
         }
     }
 
-    /**
-     * Build the analysis prompt
-     */
     private function buildAnalysisPrompt(string $jobDescription, string $resumeText): string
     {
         return "Please analyze this resume against the job description and provide:
@@ -89,12 +83,8 @@ Focus on:
 Be honest and constructive in your assessment.";
     }
 
-    /**
-     * Parse the OpenAI response
-     */
     private function parseAnalysisResponse(string $content): array
     {
-        // Try to extract JSON from the response
         $jsonStart = strpos($content, '{');
         $jsonEnd = strrpos($content, '}') + 1;
 
@@ -107,7 +97,6 @@ Be honest and constructive in your assessment.";
             }
         }
 
-        // Fallback: create a basic response if JSON parsing fails
         return [
             'fit_score' => 50,
             'strengths' => ['Resume submitted successfully'],

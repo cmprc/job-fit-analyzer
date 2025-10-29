@@ -1,8 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
-
-// Debug: Log the environment variable
-console.log('VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
-console.log('Final API_BASE_URL:', API_BASE_URL);
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class ApiService {
   async request(endpoint, options = {}) {
